@@ -18,18 +18,28 @@ app.post("/ask", async (req, res) => {
   try {
     const { query } = req.body;
 
-    // ✅ Zero-Shot Prompt
-    const prompt = `
-You are an AI assistant that explains theories and concepts clearly.
-Task: Given a concept, provide a structured explanation with these sections:
-- **Type:** (theory, method, parameter, etc.)
-- **Origin/Era:** (if applicable)
-- **Key Concepts:** (bullet points)
-- **Current Status/Consensus:** (accepted, experimental, unproven)
-- **Related Theories/Concepts:** (list related ones)
-- **Safety Note:** (if relevant)
+    // 🪄 Dynamic Prompting
+    let style = "structured, exam-ready explanation"; // default
+    if (query.toLowerCase().includes("example")) {
+      style = "explanation with practical examples";
+    } else if (query.toLowerCase().includes("history")) {
+      style = "historical background with timeline";
+    } else if (query.toLowerCase().includes("compare")) {
+      style = "comparison table and bullet points";
+    }
 
-Now explain: "${query}"
+    const prompt = `
+You are Theory Explorer AI.
+Task: Answer clearly with ${style}.
+Sections to include:
+- Type
+- Origin/Era
+- Key Concepts
+- Current Status/Consensus
+- Related Theories
+- Safety Note (if relevant)
+
+Question: "${query}"
     `;
 
     const result = await model.generateContent(prompt);
