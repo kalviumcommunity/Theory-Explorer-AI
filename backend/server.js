@@ -18,7 +18,6 @@ app.post("/ask", async (req, res) => {
   try {
     const { query } = req.body;
 
-    // 🪄 Dynamic Prompting
     let style = "structured, exam-ready explanation"; // default
     if (query.toLowerCase().includes("example")) {
       style = "explanation with practical examples";
@@ -45,7 +44,17 @@ Question: "${query}"
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
-    res.json({ answer: text });
+    // ✅ Extract token usage
+    const usage = result.response.usageMetadata;
+
+    res.json({
+      answer: text,
+      tokens: {
+        input: usage.promptTokenCount || 0,
+        output: usage.candidatesTokenCount || 0,
+        total: usage.totalTokenCount || 0,
+      },
+    });
   } catch (error) {
     console.error("Error in /ask:", error);
     res.status(500).json({ error: "Something went wrong" });
