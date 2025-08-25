@@ -1,0 +1,99 @@
+
+[
+  {
+    "id": "gravitation_newton",
+    "name": "Newtonian Gravitation",
+    "type": "scientific",
+    "domain": "physics",
+    "era": "17th century",
+    "summary": "A classical theory describing gravity as an attractive force between masses, inversely proportional to the square of the distance.",
+    "key_concepts": ["inverse-square law", "force", "mass"],
+    "status": "superseded in extremes by General Relativity; still useful at low speeds/weak fields",
+    "sources": ["Principia Mathematica (1687)"],
+    "tags": ["mechanics", "classical physics"]
+  },
+  {
+    "id": "general_relativity",
+    "name": "General Relativity",
+    "type": "scientific",
+    "domain": "physics",
+    "era": "20th century",
+    "summary": "Einstein's geometric theory of gravitation where mass-energy curves spacetime and free-falling objects follow geodesics.",
+    "key_concepts": ["spacetime curvature", "geodesics", "equivalence principle"],
+    "status": "well-tested; breaks down near singularities / not unified with quantum mechanics",
+    "sources": ["Einstein (1915)", "Eddington eclipse 1919", "LIGO"],
+    "tags": ["gravity", "relativity"]
+  },
+  {
+    "id": "string_theory",
+    "name": "String Theory",
+    "type": "scientific",
+    "domain": "theoretical physics",
+    "era": "late 20th century",
+    "summary": "Proposes that fundamental particles are one-dimensional strings; aims to unify quantum mechanics and gravity.",
+    "key_concepts": ["strings", "branes", "extra dimensions"],
+    "status": "unconfirmed; mathematically rich",
+    "sources": ["Polchinski", "Witten"],
+    "tags": ["unification", "quantum gravity"]
+  },
+  {
+    "id": "miasma_theory",
+    "name": "Miasma Theory of Disease",
+    "type": "historical",
+    "domain": "medicine",
+    "era": "antiquity–19th century",
+    "summary": "Disease was thought to be caused by 'bad air' (miasma). Replaced by germ theory.",
+    "key_concepts": ["bad air", "odor", "sanitation"],
+    "status": "discredited",
+    "sources": ["Nightingale", "Chadwick"],
+    "tags": ["history of medicine"]
+  },
+  {
+    "id": "germ_theory",
+    "name": "Germ Theory of Disease",
+    "type": "scientific",
+    "domain": "biology/medicine",
+    "era": "19th century",
+    "summary": "Microorganisms are the cause of many diseases; led to antisepsis, vaccination, and antibiotics.",
+    "key_concepts": ["pathogens", "infection", "Koch's postulates"],
+    "status": "established",
+    "sources": ["Pasteur", "Koch"],
+    "tags": ["microbiology", "public health"]
+  },
+  {
+    "id": "simulation_hypothesis",
+    "name": "Simulation Hypothesis",
+    "type": "philosophical",
+    "domain": "philosophy of mind/metaphysics",
+    "era": "21st century prominence",
+    "summary": "The idea that reality could be an artificial simulation (e.g., computer simulation).",
+    "key_concepts": ["posthuman", "substrate-independence", "indistinguishability"],
+    "status": "speculative",
+    "sources": ["Bostrom (2003)"],
+    "tags": ["metaphysics", "ai"]
+  },
+  {
+    "id": "hogwarts_magic_theory",
+    "name": "Hogwarts Magic Theory",
+    "type": "imaginary",
+    "domain": "fantasy",
+    "era": "fictional / contemporary",
+    "summary": "Within the Harry Potter universe, magic is a manipulable force governed by wands, incantations, and intent.",
+    "key_concepts": ["spells", "wands", "incantations"],
+    "status": "fictional",
+    "sources": ["Rowling's works"],
+    "tags": ["fantasy", "worldbuilding"]
+  },
+  {
+    "id": "flat_earth",
+    "name": "Flat Earth Theory",
+    "type": "pseudoscientific",
+    "domain": "cosmology",
+    "era": "ancient origins / modern revival",
+    "summary": "Claims Earth is flat; conflicts with observational evidence (satellites, circumnavigation, photos, physics).",
+    "key_concepts": ["horizon misinterpretation", "conspiracy"],
+    "status": "discredited",
+    "sources": ["astronomy", "spaceflight data"],
+    "tags": ["debunked", "critical thinking"]
+  }
+]

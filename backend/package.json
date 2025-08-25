@@ -1,0 +1,31 @@
+{
+  "name": "theory-explorer-ai",
+  "version": "1.0.0",
+  "description": "**Theory Explorer AI** is an AI-powered assistant that explains complex scientific theories like black holes, relativity, and quantum mechanics in simple, structured formats tailored to the user's level (Beginner to Expert).",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalviumcommunity/Theory-Explorer-AI.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kalviumcommunity/Theory-Explorer-AI/issues"
+  },
+  "homepage": "https://github.com/kalviumcommunity/Theory-Explorer-AI#readme",
+  "keywords": [],
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.15.0"
+  }
+}
