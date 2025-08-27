@@ -41,16 +41,21 @@ async def ask_gemini(request: QueryRequest):
         elif "compare" in query.lower():
             style = "comparison table and bullet points"
 
+        # ✅ Structured Output JSON format
         prompt = f"""
 You are Theory Explorer AI.
-Task: Answer clearly with {style}.
-Sections to include:
-- Type
-- Origin/Era
-- Key Concepts
-- Current Status/Consensus
-- Related Theories
-- Safety Note (if relevant)
+Task: Answer clearly in JSON format with structured sections.
+Always reply ONLY in valid JSON. No extra text.
+
+JSON structure:
+{{
+  "type": "string",
+  "origin_era": "string",
+  "key_concepts": ["list of strings"],
+  "current_status": "string",
+  "related_theories": ["list of strings"],
+  "safety_note": "string"
+}}
 
 Question: "{query}"
         """
