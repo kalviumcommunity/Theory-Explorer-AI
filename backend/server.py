@@ -32,7 +32,7 @@ async def ask_gemini(request: QueryRequest):
     try:
         query = request.query
 
-        # 🪄 Dynamic prompting
+        # 🪄 Dynamic prompting style
         style = "structured, exam-ready explanation"
         if "example" in query.lower():
             style = "explanation with practical examples"
@@ -41,13 +41,11 @@ async def ask_gemini(request: QueryRequest):
         elif "compare" in query.lower():
             style = "comparison table and bullet points"
 
-        # ✅ Structured Output JSON format
-        prompt = f"""
+        # ✅ Define system + user prompts
+        system_instruction = f"""
 You are Theory Explorer AI.
-Task: Answer clearly in JSON format with structured sections.
 Always reply ONLY in valid JSON. No extra text.
-
-JSON structure:
+Use this structure:
 {{
   "type": "string",
   "origin_era": "string",
@@ -56,16 +54,20 @@ JSON structure:
   "related_theories": ["list of strings"],
   "safety_note": "string"
 }}
-
-Question: "{query}"
+Answer style: {style}.
         """
 
-        # ✅ Create model
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        user_prompt = f"Question: {query}"
+
+        # ✅ Create model with system instruction
+        model = genai.GenerativeModel(
+            "gemini-1.5-flash",
+            system_instruction=system_instruction
+        )
 
         # ✅ Generate response
         response = model.generate_content(
-            prompt,
+            [user_prompt],
             generation_config=genai.GenerationConfig(
                 temperature=0.7,
                 top_p=0.9,
