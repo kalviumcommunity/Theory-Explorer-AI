@@ -30,7 +30,7 @@ class ChatRequest(BaseModel):
 @app.post("/ask")
 async def ask_gemini(request: ChatRequest):
     try:
-        # Flatten all user queries to detect style keywords
+        # Flatten user queries to detect style keywords
         all_queries = " ".join([msg["text"] for msg in request.messages if msg["role"] == "user"])
 
         # Dynamic prompting style
@@ -49,7 +49,7 @@ Always reply in plain explanatory text (not JSON).
 Answer style: {style}.
 """
 
-        # Convert messages into Gemini chat format
+        # Convert conversation history
         history = []
         for msg in request.messages:
             if msg["role"] == "user":
@@ -63,7 +63,7 @@ Answer style: {style}.
             system_instruction=system_instruction
         )
 
-        # Generate response with full conversation history + stop sequence
+        # Generate response with history
         response = model.generate_content(
             history,
             generation_config=genai.GenerationConfig(
@@ -71,18 +71,25 @@ Answer style: {style}.
                 top_p=0.9,
                 top_k=40,
                 max_output_tokens=512,
-                stop_sequences=["STOP", "END"]  # 👈 added stop sequence
+                stop_sequences=["STOP", "END"]
             )
         )
 
+        # Extract plain answer safely
+        answer = response.text
+        if not answer and response.candidates:
+            parts = response.candidates[0].content.parts
+            answer = " ".join([p.text for p in parts if hasattr(p, "text")])
+
         # Extract tokens safely
+        usage = getattr(response, "usage_metadata", {}) or {}
         tokens = {
-            "input": getattr(getattr(response, "usage_metadata", {}), "prompt_token_count", 0),
-            "output": getattr(getattr(response, "usage_metadata", {}), "candidates_token_count", 0),
-            "total": getattr(getattr(response, "usage_metadata", {}), "total_token_count", 0),
+            "input": usage.get("prompt_token_count", 0),
+            "output": usage.get("candidates_token_count", 0),
+            "total": usage.get("total_token_count", 0),
         }
 
-        return {"answer": response.text, "tokens": tokens}
+        return {"answer": answer, "tokens": tokens}
 
     except Exception as e:
         print("Error:", str(e))
