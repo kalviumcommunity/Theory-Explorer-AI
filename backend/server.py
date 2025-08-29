@@ -5,25 +5,25 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# Load .env file
+# Load environment variables
 load_dotenv()
 
 # Configure Gemini API
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Initialize FastAPI
+# Initialize FastAPI app
 app = FastAPI()
 
-# Allow CORS (React will call this API)
+# Allow frontend (React) to access backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # Change to ["http://localhost:5173"] for more security
+    allow_origins=["*"],  # 👈 for dev; later replace with ["http://localhost:5173"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Define request body
+# Request body
 class QueryRequest(BaseModel):
     query: str
 
@@ -32,42 +32,31 @@ async def ask_gemini(request: QueryRequest):
     try:
         query = request.query
 
-        # 🪄 Dynamic prompting style
-        style = "structured, exam-ready explanation"
+        # Dynamic style selection
+        style = "exam-ready explanation"
         if "example" in query.lower():
             style = "explanation with practical examples"
         elif "history" in query.lower():
             style = "historical background with timeline"
         elif "compare" in query.lower():
-            style = "comparison table and bullet points"
+            style = "comparison with bullet points"
 
-        # ✅ Define system + user prompts
+        # System instruction
         system_instruction = f"""
 You are Theory Explorer AI.
-Always reply ONLY in valid JSON. No extra text.
-Use this structure:
-{{
-  "type": "string",
-  "origin_era": "string",
-  "key_concepts": ["list of strings"],
-  "current_status": "string",
-  "related_theories": ["list of strings"],
-  "safety_note": "string"
-}}
+Explain in a clear, simple way. 
 Answer style: {style}.
-        """
+"""
 
-        user_prompt = f"Question: {query}"
-
-        # ✅ Create model with system instruction
+        # Create Gemini model with system instruction
         model = genai.GenerativeModel(
             "gemini-1.5-flash",
             system_instruction=system_instruction
         )
 
-        # ✅ Generate response
+        # Generate response
         response = model.generate_content(
-            [user_prompt],
+            query,
             generation_config=genai.GenerationConfig(
                 temperature=0.7,
                 top_p=0.9,
@@ -76,7 +65,17 @@ Answer style: {style}.
             )
         )
 
-        return {"answer": response.text}
+        # Extract text
+        answer_text = response.text.strip() if response.text else "No response."
+
+        # Token usage (if available)
+        tokens = {
+            "input": getattr(response.usage_metadata, "prompt_token_count", 0),
+            "output": getattr(response.usage_metadata, "candidates_token_count", 0),
+            "total": getattr(response.usage_metadata, "total_token_count", 0),
+        }
+
+        return {"answer": answer_text, "tokens": tokens}
 
     except Exception as e:
         print("Error:", str(e))
