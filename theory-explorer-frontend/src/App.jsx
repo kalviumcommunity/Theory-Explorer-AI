@@ -1,62 +1,63 @@
 // App.jsx
 import React, { useState } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
 import "./App.css";
 
 function App() {
   const [query, setQuery] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [tokens, setTokens] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
+
+    // Show user message
+    const userMsg = { role: "user", text: query };
+    setMessages((prev) => [...prev, userMsg]);
+
     setLoading(true);
-    setAnswer("");
-    setTokens(null);
+
     try {
-      const res = await axios.post("http://localhost:5000/ask", { query });
-      setAnswer(res.data.answer);
-      setTokens(res.data.tokens); // ✅ tokens from backend
+      const res = await axios.post("http://127.0.0.1:8000/ask", { query });
+      const aiMsg = { role: "ai", text: res.data.answer || "⚠️ No response." };
+
+      setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
       console.error(err);
-      setAnswer("⚠️ Error: Could not fetch answer.");
+      const errorMsg = { role: "ai", text: "⚠️ Error: Could not fetch answer." };
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
+      setQuery("");
       setLoading(false);
     }
   };
 
   return (
     <div className="app-container">
-      <h1>Theory Explorer AI 🌌</h1>
+      <h1 className="title">✨ Theory Explorer AI ✨</h1>
+
+      {/* Chat Window */}
+      <div className="chat-window">
+        {messages.map((msg, idx) => (
+          <div key={idx} className={`chat-bubble ${msg.role}`}>
+            <ReactMarkdown>{msg.text}</ReactMarkdown>
+          </div>
+        ))}
+        {loading && <p className="loading">⏳ Thinking...</p>}
+      </div>
+
+      {/* Input Section */}
       <div className="input-section">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter a concept (e.g., String Theory)"
+          placeholder="Ask about any theory..."
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
         <button onClick={handleSearch}>Ask</button>
       </div>
-
-      {loading && <p>⏳ Thinking...</p>}
-
-      {answer && (
-        <div
-          className="answer-box"
-          dangerouslySetInnerHTML={{ __html: answer.replace(/\n/g, "<br/>") }}
-        />
-      )}
-
-      {/* ✅ Token display */}
-      {tokens && (
-        <div className="token-info">
-          <h3>📊 Token Usage</h3>
-          <p>🔹 Input Tokens: {tokens.input}</p>
-          <p>🔹 Output Tokens: {tokens.output}</p>
-          <p>🔹 Total Tokens: {tokens.total}</p>
-        </div>
-      )}
     </div>
   );
 }
