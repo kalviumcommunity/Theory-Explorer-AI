@@ -12,16 +12,19 @@ function App() {
   const handleSearch = async () => {
     if (!query.trim()) return;
 
-    // Show user message
+    // Add user message
     const userMsg = { role: "user", text: query };
     setMessages((prev) => [...prev, userMsg]);
 
     setLoading(true);
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/ask", { query });
-      const aiMsg = { role: "ai", text: res.data.answer || "⚠️ No response." };
+      // ✅ Send full chat history
+      const res = await axios.post("http://127.0.0.1:8000/ask", {
+        messages: [...messages, userMsg],
+      });
 
+      const aiMsg = { role: "ai", text: res.data.answer || "⚠️ No response." };
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
       console.error(err);
