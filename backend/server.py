@@ -63,7 +63,7 @@ Answer style: {style}.
             system_instruction=system_instruction
         )
 
-        # Generate response with full conversation history
+        # Generate response with full conversation history + stop sequence
         response = model.generate_content(
             history,
             generation_config=genai.GenerationConfig(
@@ -71,6 +71,7 @@ Answer style: {style}.
                 top_p=0.9,
                 top_k=40,
                 max_output_tokens=512,
+                stop_sequences=["STOP", "END"]  # 👈 added stop sequence
             )
         )
 
