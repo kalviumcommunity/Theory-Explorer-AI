@@ -11,7 +11,7 @@
 5. **Functions are called**, if needed (e.g., to fetch simulations or compare theories)
 6. **Frontend renders** the final interactive explanation
 
-## ✨ Key Featuresz
+## ✨ Key Features
 
 ### Prompting
 - Uses system + user prompts to control tone, depth, and accuracy.
