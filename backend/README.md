@@ -2,7 +2,7 @@
 
 **Theory Explorer AI** is an AI-powered assistant that explains complex scientific theories like black holes, relativity, and quantum mechanics in simple, structured formats tailored to the user's level (Beginner to Expert).
 
-## 🔧 How It Works
+## 🔧 How It Workz
 
 1. **User selects a topic and level** (e.g., "Explain Black Holes for Beginner")
 2. **System builds a prompt** using both system and user instructions
