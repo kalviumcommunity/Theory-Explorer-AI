@@ -18,8 +18,16 @@ export const loginSchema = z.object({
   body: z.object({
     email: z.string().email("Invalid email address"),
     password: z.string().min(1, "Password is required"),
+    rememberMe: z.boolean().optional(),
+  }),
+});
+
+export const googleAuthSchema = z.object({
+  body: z.object({
+    token: z.string().min(1, "Google token is required"),
   }),
 });
 
 export type RegisterBody = z.infer<typeof registerSchema>["body"];
 export type LoginBody = z.infer<typeof loginSchema>["body"];
+export type GoogleAuthBody = z.infer<typeof googleAuthSchema>["body"];

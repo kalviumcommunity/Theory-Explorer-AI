@@ -5,11 +5,13 @@ import type { User, AuthResponse } from "@/lib/types";
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
+  loginWithGoogle: (token: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: User) => void;
 }
+
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -38,13 +40,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser();
   }, [fetchUser]);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string, rememberMe: boolean = false) => {
     const res = await api.post<{ status: string; data: AuthResponse }>("/auth/login", {
       email,
       password,
+      rememberMe,
     });
     const { user: userData, token } = res.data.data;
     localStorage.setItem("token", token);
+    setUser(userData);
+  }, []);
+
+  const loginWithGoogle = useCallback(async (token: string) => {
+    const res = await api.post<{ status: string; data: AuthResponse }>("/auth/google", {
+      token,
+    });
+    const { user: userData, token: jwtToken } = res.data.data;
+    localStorage.setItem("token", jwtToken);
     setUser(userData);
   }, []);
 
@@ -73,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithGoogle, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
