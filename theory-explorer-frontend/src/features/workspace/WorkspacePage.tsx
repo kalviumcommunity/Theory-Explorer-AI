@@ -1,332 +1,96 @@
-import { useState, useEffect } from "react"
-import { useAuth } from "@/contexts/AuthContext"
-import { Card } from "@/components/ui/Card"
-import { Badge } from "@/components/ui/Badge"
-import { Skeleton } from "@/components/ui/Skeleton"
-import { EmptyState } from "@/components/ui/EmptyState"
-import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/Button"
-import { fetchWorkspaceStats } from "@/lib/users"
-import {
-  Bookmark,
-  Compass,
-  Brain,
-  TrendingUp,
-  Clock,
-  Search,
-  ArrowRight,
-  Sparkles,
-  BookOpen,
-  BarChart3,
-} from "lucide-react"
-
-const quickActions = [
-  { label: "Explore Topics", href: "/explore", icon: Compass, variant: "primary" as const },
-  { label: "View Collections", href: "/collections", icon: Bookmark, variant: "outline" as const },
-  { label: "Practice Quizzes", href: "/practice", icon: Brain, variant: "outline" as const },
-  { label: "Knowledge Graph", href: "/graph", icon: TrendingUp, variant: "outline" as const },
-]
+import { useNavigate } from 'react-router-dom';
 
 export function WorkspacePage() {
-  const { user, loading: authLoading } = useAuth()
-  const [data, setData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!authLoading) {
-      Promise.all([
-        fetchWorkspaceStats(),
-        import("@/lib/progress").then(m => m.getHistory())
-      ]).then(([statsData, historyData]) => {
-        setData({ ...statsData, history: historyData })
-        setLoading(false)
-      }).catch(() => setLoading(false))
-    }
-  }, [authLoading])
+  // Mock Data
+  const stats = {
+    streak: 12,
+    timeSpent: 120, // mins
+    conceptsLearned: 5,
+    weakTopics: ['Recursion', 'Docker']
+  };
 
-  if (authLoading || loading) {
-    return (
-      <div className="container-app py-8">
-        <div className="space-y-6">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-5 w-96" />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => <Skeleton.Card key={i} />)}
-          </div>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Skeleton.Card />
-            <Skeleton.Card />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const initials = user?.name
-    ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : "?"
+  const learningPaths = [
+    { title: 'Intro to React', progress: 60 },
+    { title: 'Advanced Algorithms', progress: 10 }
+  ];
 
   return (
-    <div className="container-app py-8">
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Welcome back, {user?.name?.split(" ")[0] || "Learner"}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Continue your learning journey. You have {user?.interests?.length || 0} topics of interest.
-        </p>
+    <div className="container-app py-8 space-y-8">
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Welcome back, Developer!</h1>
+          <p className="text-gray-500 mt-1">Here is your learning overview for today.</p>
+        </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
-              <BookOpen className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-semibold text-gray-900">{data?.stats?.conceptsExplored || 0}</p>
-              <p className="text-xs text-gray-500">Concepts Explored</p>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-xl border shadow-sm">
+          <h3 className="text-sm font-medium text-gray-500 uppercase">Learning Streak</h3>
+          <p className="text-3xl font-bold text-orange-500 mt-2">🔥 {stats.streak} Days</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl border shadow-sm">
+          <h3 className="text-sm font-medium text-gray-500 uppercase">Time Spent</h3>
+          <p className="text-3xl font-bold text-blue-600 mt-2">⏱️ {Math.floor(stats.timeSpent / 60)}h {stats.timeSpent % 60}m</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl border shadow-sm">
+          <h3 className="text-sm font-medium text-gray-500 uppercase">Concepts Mastered</h3>
+          <p className="text-3xl font-bold text-green-600 mt-2">🧠 {stats.conceptsLearned}</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl border shadow-sm">
+          <h3 className="text-sm font-medium text-gray-500 uppercase">Focus Areas</h3>
+          <div className="mt-2 flex gap-2 flex-wrap">
+            {stats.weakTopics.map((topic, i) => (
+              <span key={i} className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium">{topic}</span>
+            ))}
           </div>
-        </Card>
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-50 text-accent-600">
-              <Brain className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-semibold text-gray-900">{data?.stats?.quizzes || 0}</p>
-              <p className="text-xs text-gray-500">Quizzes Taken</p>
-            </div>
-          </div>
-        </Card>
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success-50 text-success-600">
-              <Bookmark className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-semibold text-gray-900">{data?.stats?.collections || 0}</p>
-              <p className="text-xs text-gray-500">Collections</p>
-            </div>
-          </div>
-        </Card>
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning-50 text-warning-600">
-              <BarChart3 className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-semibold text-gray-900">{data?.stats?.dayStreak || 0}</p>
-              <p className="text-xs text-gray-500">Day Streak</p>
-            </div>
-          </div>
-        </Card>
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          {/* Continue Learning */}
-          <Card>
-            <Card.Title>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-gray-400" />
-                  Continue Learning
-                </span>
-              </div>
-            </Card.Title>
-            <Card.Content className="mt-2">
-              {data?.history && data.history.length > 0 ? (
-                <div className="space-y-3 mt-4">
-                  {data.history.slice(0, 3).map((progress: any) => (
-                    <Link
-                      key={progress._id}
-                      to={`/knowledge/${progress.concept.slug}`}
-                      className="group flex items-center justify-between rounded-lg border p-3 transition-all hover:border-primary-200 hover:bg-primary-50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="rounded bg-primary-100 p-2 text-primary-600">
-                          <BookOpen className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 group-hover:text-primary-700">
-                            {progress.concept.title}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {progress.concept.estimatedReadingTime} min read • {progress.concept.category?.name || "Topic"}
-                          </p>
-                        </div>
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-primary-600" />
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState
-                  icon={<BookOpen className="h-6 w-6" />}
-                  title="No concepts in progress"
-                  description="Start exploring topics and your recent learning will appear here."
-                  action={
-                    <Link to="/explore">
-                      <Button size="sm">
-                        <Compass className="h-4 w-4" /> Explore Topics
-                      </Button>
-                    </Link>
-                  }
-                />
-              )}
-            </Card.Content>
-          </Card>
-
-          {/* Recent Activity */}
-          <Card>
-            <Card.Title>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-gray-400" />
-                  Recent Activity
-                </span>
-              </div>
-            </Card.Title>
-            <Card.Content className="mt-2">
-              {data?.recentActivity?.length > 0 ? (
-                <div className="space-y-4 mt-4">
-                  {data.recentActivity.map((act: any) => (
-                    <div key={act._id} className="flex items-start gap-3">
-                      <div className="mt-0.5 rounded-full bg-gray-100 p-1.5 text-gray-500">
-                        <TrendingUp className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {act.type === 'view' ? 'Viewed concept' : act.type}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(act.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
+          <h2 className="text-xl font-bold text-gray-900">Active Learning Paths</h2>
+          <div className="space-y-4">
+            {learningPaths.map((path, i) => (
+              <div key={i} className="bg-white p-6 rounded-xl border shadow-sm flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-lg">{path.title}</h3>
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-primary-600" style={{ width: `${path.progress}%` }}></div>
                     </div>
-                  ))}
+                    <span className="text-sm text-gray-500">{path.progress}%</span>
+                  </div>
                 </div>
-              ) : (
-                <EmptyState
-                  icon={<Search className="h-6 w-6" />}
-                  title="No activity yet"
-                  description="Your searches, views, and quiz attempts will be recorded here."
-                  action={
-                    <Link to="/explore">
-                      <Button variant="outline" size="sm">Start Exploring</Button>
-                    </Link>
-                  }
-                />
-              )}
-            </Card.Content>
-          </Card>
-
-          {/* Recommended Concepts */}
-          <Card>
-            <Card.Title>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-gray-400" />
-                  Recommended for You
-                </span>
+                <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors">
+                  Continue
+                </button>
               </div>
-            </Card.Title>
-            <Card.Description>
-              Based on your interests: {user?.interests?.join(", ") || "not specified"}
-            </Card.Description>
-            <Card.Content className="mt-4">
-              <EmptyState
-                icon={<Sparkles className="h-6 w-6" />}
-                title="Add interests to get recommendations"
-                description="Update your profile with topics you're interested in."
-                action={
-                  <Link to="/profile">
-                    <Button variant="outline" size="sm">Edit Profile</Button>
-                  </Link>
-                }
-              />
-            </Card.Content>
-          </Card>
+            ))}
+          </div>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Profile Summary */}
-          <Card>
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-base font-semibold text-primary-700">
-                {initials}
-              </div>
+          <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
+          <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4">
+            <button onClick={() => navigate('/practice')} className="w-full text-left p-4 rounded-lg hover:bg-gray-50 border transition-colors flex items-center justify-between group">
               <div>
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500">{user?.email}</p>
+                <strong className="block text-gray-900 group-hover:text-primary-600">Daily Review (SRS)</strong>
+                <span className="text-xs text-gray-500">12 flashcards due today</span>
               </div>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {user?.interests?.map((interest) => (
-                <Badge key={interest} size="sm">{interest}</Badge>
-              ))}
-            </div>
-            <Link to="/profile">
-              <Button variant="ghost" size="sm" className="mt-3 w-full">
-                View Profile
-              </Button>
-            </Link>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <Card.Title className="text-sm">Quick Actions</Card.Title>
-            <Card.Content className="mt-2 space-y-2">
-              {quickActions.map((action) => {
-                const Icon = action.icon
-                return (
-                  <Link
-                    key={action.href}
-                    to={action.href}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
-                  >
-                    <Icon className="h-4 w-4" />
-                    {action.label}
-                    <ArrowRight className="ml-auto h-3.5 w-3.5 text-gray-300" />
-                  </Link>
-                )
-              })}
-            </Card.Content>
-          </Card>
-
-          {/* Weekly Progress */}
-          <Card>
-            <Card.Title className="text-sm">This Week</Card.Title>
-            <Card.Content className="mt-4">
-              <div className="flex justify-between gap-1">
-                {["M", "T", "W", "T", "F", "S", "S"].map((day, i) => (
-                  <div key={i} className="flex flex-col items-center gap-1">
-                    <span className="text-xs text-gray-400">{day}</span>
-                    <div
-                      className={`h-8 w-8 rounded-lg ${
-                        i < new Date().getDay() - 1
-                          ? "bg-primary-200"
-                          : i === new Date().getDay() - 1
-                          ? "bg-primary-500"
-                          : "bg-gray-100"
-                      }`}
-                    />
-                  </div>
-                ))}
+              <span className="text-gray-400">→</span>
+            </button>
+            <button onClick={() => navigate('/graph')} className="w-full text-left p-4 rounded-lg hover:bg-gray-50 border transition-colors flex items-center justify-between group">
+              <div>
+                <strong className="block text-gray-900 group-hover:text-primary-600">Knowledge Graph</strong>
+                <span className="text-xs text-gray-500">Explore the global map</span>
               </div>
-              <p className="mt-3 text-center text-xs text-gray-500">
-                {data?.recentActivity?.length || 0} activities this week
-              </p>
-            </Card.Content>
-          </Card>
+              <span className="text-gray-400">→</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
