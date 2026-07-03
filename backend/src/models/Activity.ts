@@ -21,5 +21,6 @@ const activitySchema = new Schema<IActivity>(
 );
 
 activitySchema.index({ user: 1, createdAt: -1 });
+activitySchema.index({ user: 1, type: 1 });
 
 export const Activity = mongoose.model<IActivity>("Activity", activitySchema);
