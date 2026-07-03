@@ -10,6 +10,7 @@ export interface IConcept extends Document {
   tags: string[];
   difficulty: "beginner" | "intermediate" | "advanced";
   estimatedReadingTime: number; // in minutes
+  embedding?: number[];
   references: Array<{ title: string; url: string }>;
   status: "draft" | "published" | "archived";
   version: number;
@@ -29,6 +30,7 @@ const conceptSchema = new Schema<IConcept>(
     tags: [{ type: String, trim: true }],
     difficulty: { type: String, enum: ["beginner", "intermediate", "advanced"], required: true },
     estimatedReadingTime: { type: Number, required: true },
+    embedding: { type: [Number], index: true },
     references: [
       {
         title: { type: String, required: true },
