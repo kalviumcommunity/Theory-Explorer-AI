@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { Card } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
@@ -5,6 +6,7 @@ import { Skeleton } from "@/components/ui/Skeleton"
 import { EmptyState } from "@/components/ui/EmptyState"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/Button"
+import { fetchWorkspaceStats } from "@/lib/users"
 import {
   Bookmark,
   Compass,
@@ -26,9 +28,20 @@ const quickActions = [
 ]
 
 export function WorkspacePage() {
-  const { user, loading } = useAuth()
+  const { user, loading: authLoading } = useAuth()
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  if (loading) {
+  useEffect(() => {
+    if (!authLoading) {
+      fetchWorkspaceStats().then((res) => {
+        setData(res)
+        setLoading(false)
+      }).catch(() => setLoading(false))
+    }
+  }, [authLoading])
+
+  if (authLoading || loading) {
     return (
       <div className="container-app py-8">
         <div className="space-y-6">
@@ -70,7 +83,7 @@ export function WorkspacePage() {
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-2xl font-semibold text-gray-900">0</p>
+              <p className="text-2xl font-semibold text-gray-900">{data?.stats?.conceptsExplored || 0}</p>
               <p className="text-xs text-gray-500">Concepts Explored</p>
             </div>
           </div>
@@ -81,7 +94,7 @@ export function WorkspacePage() {
               <Brain className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-2xl font-semibold text-gray-900">0</p>
+              <p className="text-2xl font-semibold text-gray-900">{data?.stats?.quizzes || 0}</p>
               <p className="text-xs text-gray-500">Quizzes Taken</p>
             </div>
           </div>
@@ -92,7 +105,7 @@ export function WorkspacePage() {
               <Bookmark className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-2xl font-semibold text-gray-900">0</p>
+              <p className="text-2xl font-semibold text-gray-900">{data?.stats?.collections || 0}</p>
               <p className="text-xs text-gray-500">Collections</p>
             </div>
           </div>
@@ -103,7 +116,7 @@ export function WorkspacePage() {
               <BarChart3 className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-2xl font-semibold text-gray-900">0</p>
+              <p className="text-2xl font-semibold text-gray-900">{data?.stats?.dayStreak || 0}</p>
               <p className="text-xs text-gray-500">Day Streak</p>
             </div>
           </div>
@@ -150,16 +163,36 @@ export function WorkspacePage() {
               </div>
             </Card.Title>
             <Card.Content className="mt-2">
-              <EmptyState
-                icon={<Search className="h-6 w-6" />}
-                title="No activity yet"
-                description="Your searches, views, and quiz attempts will be recorded here."
-                action={
-                  <Link to="/explore">
-                    <Button variant="outline" size="sm">Start Exploring</Button>
-                  </Link>
-                }
-              />
+              {data?.recentActivity?.length > 0 ? (
+                <div className="space-y-4 mt-4">
+                  {data.recentActivity.map((act: any) => (
+                    <div key={act._id} className="flex items-start gap-3">
+                      <div className="mt-0.5 rounded-full bg-gray-100 p-1.5 text-gray-500">
+                        <TrendingUp className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {act.type === 'view' ? 'Viewed concept' : act.type}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(act.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={<Search className="h-6 w-6" />}
+                  title="No activity yet"
+                  description="Your searches, views, and quiz attempts will be recorded here."
+                  action={
+                    <Link to="/explore">
+                      <Button variant="outline" size="sm">Start Exploring</Button>
+                    </Link>
+                  }
+                />
+              )}
             </Card.Content>
           </Card>
 
@@ -258,7 +291,7 @@ export function WorkspacePage() {
                 ))}
               </div>
               <p className="mt-3 text-center text-xs text-gray-500">
-                0 activities this week
+                {data?.recentActivity?.length || 0} activities this week
               </p>
             </Card.Content>
           </Card>

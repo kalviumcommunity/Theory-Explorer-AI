@@ -15,3 +15,8 @@ export async function updatePreferences(prefs: Partial<User["preferences"]>): Pr
   const res = await api.put<ApiResponse<{ preferences: User["preferences"] }>>("/users/preferences", prefs)
   return res.data.data!.preferences
 }
+
+export async function fetchWorkspaceStats() {
+  const res = await api.get<ApiResponse<any>>("/users/workspace")
+  return res.data.data
+}
