@@ -1,0 +1,7 @@
+export function KnowledgePage() {
+  return (
+    <div className="container-app py-8">
+      <h1 className="text-2xl font-semibold text-gray-900">Knowledge</h1>
+    </div>
+  )
+}
