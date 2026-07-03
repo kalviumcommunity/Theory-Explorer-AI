@@ -1,24 +1,41 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/Button"
+import { useAuth } from "@/contexts/AuthContext"
 import {
   Menu,
   X,
   Search,
   Bell,
-  User,
   ChevronDown,
   Bookmark,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react"
 
 interface NavbarProps {
   variant?: "public" | "app"
+  onSidebarToggle?: () => void
 }
 
-export function Navbar({ variant = "public" }: NavbarProps) {
+export function Navbar({ variant = "public", onSidebarToggle }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
+  const { user, logout } = useAuth()
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const publicLinks = [
     { label: "Features", href: "#features" },
@@ -26,15 +43,18 @@ export function Navbar({ variant = "public" }: NavbarProps) {
     { label: "Testimonials", href: "#testimonials" },
   ]
 
+  const initials = user?.name
+    ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "?"
+
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 w-full border-b border-gray-200/80 bg-white/95 backdrop-blur-sm",
-      )}
-    >
+    <header className={cn("sticky top-0 z-50 w-full border-b border-gray-200/80 bg-white/95 backdrop-blur-sm")}>
       <div className="container-app flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 shrink-0">
+        <Link
+          to={variant === "app" ? "/workspace" : "/"}
+          className="flex items-center gap-2.5 shrink-0"
+        >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
             <Bookmark className="h-4 w-4 text-white" />
           </div>
@@ -96,27 +116,77 @@ export function Navbar({ variant = "public" }: NavbarProps) {
                 <Bell className="h-5 w-5" />
                 <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary-500 ring-2 ring-white" />
               </button>
-              <button
-                type="button"
-                className="flex items-center gap-2 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100"
-                aria-label="Profile menu"
-              >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-sm font-medium text-primary-700">
-                  JD
-                </div>
-                <ChevronDown className="hidden h-4 w-4 sm:block" />
-              </button>
+
+              <div ref={profileRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="flex items-center gap-2 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100"
+                  aria-label="Profile menu"
+                  aria-expanded={profileOpen}
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-sm font-medium text-primary-700">
+                    {initials}
+                  </div>
+                  <ChevronDown className="hidden h-4 w-4 sm:block" />
+                </button>
+
+                {profileOpen && (
+                  <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg animate-scale-in">
+                    <div className="border-b border-gray-100 px-3 py-2">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {user?.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                    <Link
+                      to="/profile"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      <User className="h-4 w-4" />
+                      Profile
+                    </Link>
+                    <Link
+                      to="/settings"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      <Settings className="h-4 w-4" />
+                      Settings
+                    </Link>
+                    <div className="mt-1 border-t border-gray-100 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => { setProfileOpen(false); logout() }}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sign out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </>
           )}
 
-          {/* Mobile menu toggle */}
+          {/* Mobile menu / sidebar toggle */}
           <button
             type="button"
             className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 md:hidden"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            onClick={() => {
+              if (variant === "app" && onSidebarToggle) {
+                onSidebarToggle()
+              } else {
+                setMobileOpen(!mobileOpen)
+              }
+            }}
+            aria-label="Toggle navigation"
           >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {variant === "app" ? <Menu className="h-5 w-5" /> : mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
