@@ -7,6 +7,12 @@ import { AppError } from "./utils/AppError.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import conceptRoutes from "./routes/conceptRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import collectionRoutes from "./routes/collectionRoutes.js";
+import bookmarkRoutes from "./routes/bookmarkRoutes.js";
+import progressRoutes from "./routes/progressRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
 
 const app = express();
 
@@ -25,6 +31,12 @@ app.use("/api/", limiter);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/concepts", conceptRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/collections", collectionRoutes);
+app.use("/api/bookmarks", bookmarkRoutes);
+app.use("/api/progress", progressRoutes);
+app.use("/api/search", searchRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "success", message: "Concept Atlas API is running" });
