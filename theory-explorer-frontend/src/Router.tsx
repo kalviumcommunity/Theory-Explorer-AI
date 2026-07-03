@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 import { PublicLayout } from "@/components/layout/PublicLayout"
 import { AppLayout } from "@/components/layout/AppLayout"
 import { AuthLayout } from "@/components/layout/AuthLayout"
+import { ProtectedRoute } from "@/components/layout/ProtectedRoute"
 import { LandingPage } from "@/features/landing/LandingPage"
 import { WorkspacePage } from "@/features/workspace/WorkspacePage"
 import { ExplorePage } from "@/features/explore/ExplorePage"
@@ -16,6 +17,14 @@ import { LoginPage } from "@/features/auth/LoginPage"
 import { RegisterPage } from "@/features/auth/RegisterPage"
 import { NotFoundPage } from "@/features/errors/NotFoundPage"
 import { UnauthorizedPage } from "@/features/errors/UnauthorizedPage"
+
+function ProtectedAppLayout() {
+  return (
+    <ProtectedRoute>
+      <AppLayout />
+    </ProtectedRoute>
+  )
+}
 
 export const router = createBrowserRouter([
   {
@@ -35,7 +44,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <AppLayout />,
+    element: <ProtectedAppLayout />,
     children: [
       { path: "workspace", element: <WorkspacePage /> },
       { path: "explore", element: <ExplorePage /> },

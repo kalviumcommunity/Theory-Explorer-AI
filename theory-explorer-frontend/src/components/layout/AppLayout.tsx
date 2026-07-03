@@ -8,7 +8,7 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar variant="app" />
+      <Navbar variant="app" onSidebarToggle={() => setSidebarOpen(!sidebarOpen)} />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="md:pl-60 pt-16">
         <main className="min-h-[calc(100vh-4rem)]">
