@@ -1,9 +1,43 @@
-import { Link } from "react-router-dom"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/contexts/ToastContext"
 import { Mail, Lock, User, ArrowRight } from "lucide-react"
 
 export function RegisterPage() {
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const { register } = useAuth()
+  const { toast } = useToast()
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters")
+      return
+    }
+    setLoading(true)
+    try {
+      await register(name, email, password)
+      toast("success", "Account created!", "Welcome to Concept Atlas.")
+      navigate("/workspace", { replace: true })
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Registration failed"
+      setError(msg)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <>
       <div className="mb-8">
@@ -13,12 +47,19 @@ export function RegisterPage() {
         </p>
       </div>
 
-      <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {error && (
+          <div className="rounded-lg border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-700" role="alert">
+            {error}
+          </div>
+        )}
         <Input
           label="Full name"
           type="text"
           placeholder="John Doe"
           icon={<User className="h-4 w-4" />}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
         />
         <Input
@@ -26,16 +67,20 @@ export function RegisterPage() {
           type="email"
           placeholder="name@example.com"
           icon={<Mail className="h-4 w-4" />}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <Input
           label="Password"
           type="password"
-          placeholder="Create a strong password"
+          placeholder="Create a strong password (8+ characters)"
           icon={<Lock className="h-4 w-4" />}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <Button type="submit" className="w-full" size="lg">
+        <Button type="submit" className="w-full" size="lg" loading={loading}>
           Create Account
           <ArrowRight className="h-4 w-4" />
         </Button>
