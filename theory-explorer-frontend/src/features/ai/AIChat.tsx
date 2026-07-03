@@ -102,23 +102,54 @@ export function AIChat() {
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="p-4 border-t bg-white flex gap-2">
-        <input 
-          type="text" 
-          placeholder="Ask a question about any topic..." 
-          className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all shadow-sm"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          disabled={loading}
-        />
+      {/* Quick Actions (AI Tutor) */}
+      <div className="flex gap-2 p-4 border-t bg-gray-50 overflow-x-auto">
         <button 
-          type="submit" 
-          disabled={loading || !input.trim()}
-          className="bg-primary-600 text-white px-5 py-3 rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors shadow-sm flex items-center gap-2 font-medium"
+          onClick={() => handleSend("Explain this simpler")}
+          className="whitespace-nowrap px-3 py-1 bg-white border rounded-full text-xs text-gray-600 hover:bg-gray-100 transition-colors"
         >
-          <Send className="h-4 w-4" /> <span className="hidden sm:inline">Send</span>
+          Explain Simpler
         </button>
-      </form>
+        <button 
+          onClick={() => handleSend("Go deeper into this topic")}
+          className="whitespace-nowrap px-3 py-1 bg-white border rounded-full text-xs text-gray-600 hover:bg-gray-100 transition-colors"
+        >
+          Go Deeper
+        </button>
+        <button 
+          onClick={() => handleSend("Give me a real-world example")}
+          className="whitespace-nowrap px-3 py-1 bg-white border rounded-full text-xs text-gray-600 hover:bg-gray-100 transition-colors"
+        >
+          Give Example
+        </button>
+        <button 
+          onClick={() => handleSend("Start Interview Mode for this topic")}
+          className="whitespace-nowrap px-3 py-1 bg-white border rounded-full text-xs text-gray-600 hover:bg-gray-100 transition-colors"
+        >
+          Interview Mode
+        </button>
+      </div>
+
+      <div className="p-4 border-t">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Ask AI anything..."
+            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-4 py-2 border"
+            disabled={loading}
+          />
+          <button
+            onClick={() => handleSend()}
+            disabled={loading || !input.trim()}
+            className="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
+          >
+            {loading ? "..." : "Send"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

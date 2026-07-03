@@ -11,6 +11,8 @@ export interface IConcept extends Document {
   difficulty: "beginner" | "intermediate" | "advanced";
   estimatedReadingTime: number; // in minutes
   embedding?: number[];
+  prerequisites: mongoose.Types.ObjectId[];
+  relatedTopics: mongoose.Types.ObjectId[];
   references: Array<{ title: string; url: string }>;
   status: "draft" | "published" | "archived";
   version: number;
@@ -31,6 +33,8 @@ const conceptSchema = new Schema<IConcept>(
     difficulty: { type: String, enum: ["beginner", "intermediate", "advanced"], required: true },
     estimatedReadingTime: { type: Number, required: true },
     embedding: { type: [Number], index: true },
+    prerequisites: [{ type: Schema.Types.ObjectId, ref: "Concept" }],
+    relatedTopics: [{ type: Schema.Types.ObjectId, ref: "Concept" }],
     references: [
       {
         title: { type: String, required: true },
