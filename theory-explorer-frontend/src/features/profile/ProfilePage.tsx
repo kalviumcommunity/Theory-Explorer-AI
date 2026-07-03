@@ -20,6 +20,7 @@ export function ProfilePage() {
 
   const [name, setName] = useState("")
   const [username, setUsername] = useState("")
+  const [avatar, setAvatar] = useState("")
   const [bio, setBio] = useState("")
   const [interests, setInterests] = useState("")
   const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "advanced">("intermediate")
@@ -28,6 +29,7 @@ export function ProfilePage() {
     if (user) {
       setName(user.name)
       setUsername(user.username || "")
+      setAvatar(user.avatar || "")
       setBio(user.bio || "")
       setInterests(user.interests?.join(", ") || "")
       setDifficulty(user.difficulty)
@@ -42,6 +44,7 @@ export function ProfilePage() {
       const updated = await updateProfile({
         name,
         username: username || undefined,
+        avatar: avatar || undefined,
         bio: bio || undefined,
         interests: interests.split(",").map((s) => s.trim()).filter(Boolean),
         difficulty,
@@ -85,9 +88,17 @@ export function ProfilePage() {
         {/* Left column - Avatar & Stats */}
         <div className="space-y-6">
           <Card className="text-center">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary-100 text-2xl font-semibold text-primary-700">
-              {initials}
-            </div>
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="mx-auto h-20 w-20 rounded-full object-cover"
+              />
+            ) : (
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary-100 text-2xl font-semibold text-primary-700">
+                {initials}
+              </div>
+            )}
             <Card.Title className="mt-4">{user?.name}</Card.Title>
             <p className="text-sm text-gray-500">{user?.email}</p>
             {user?.username && (
@@ -142,9 +153,16 @@ export function ProfilePage() {
             </div>
           </Card>
 
-          <p className="text-xs text-gray-400 text-center">
-            Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "N/A"}
-          </p>
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-xs text-gray-400 text-center">
+              Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "N/A"}
+            </p>
+            {user?.isActive !== undefined && (
+              <Badge variant={user.isActive ? "success" : "danger"}>
+                {user.isActive ? "Active Account" : "Deactivated"}
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Right column - Edit Profile */}
@@ -194,6 +212,12 @@ export function ProfilePage() {
                     placeholder="your-username"
                   />
                 </div>
+                <Input
+                  label="Avatar URL"
+                  value={avatar}
+                  onChange={(e) => setAvatar(e.target.value)}
+                  placeholder="https://example.com/avatar.png"
+                />
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-gray-700">Bio</label>
                   <textarea

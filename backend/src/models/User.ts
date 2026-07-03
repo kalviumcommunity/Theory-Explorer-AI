@@ -5,6 +5,7 @@ export interface IUserPreferences {
   theme: "light" | "dark" | "system";
   language: string;
   explanationLevel: "beginner" | "intermediate" | "advanced";
+  aiModel?: "gpt-4" | "gemini-1.5" | "claude-3";
   emailNotifications: boolean;
 }
 
@@ -18,6 +19,7 @@ export interface IUser extends Document {
   interests: string[];
   difficulty: "beginner" | "intermediate" | "advanced";
   googleId?: string;
+  role: "user" | "admin";
   preferences: IUserPreferences;
   isActive: boolean;
   lastLogin?: Date;
@@ -34,6 +36,11 @@ const preferencesSchema = new Schema<IUserPreferences>(
       type: String,
       enum: ["beginner", "intermediate", "advanced"],
       default: "intermediate",
+    },
+    aiModel: {
+      type: String,
+      enum: ["gpt-4", "gemini-1.5", "claude-3"],
+      default: "gemini-1.5",
     },
     emailNotifications: { type: Boolean, default: true },
   },
@@ -61,6 +68,7 @@ const userSchema = new Schema<IUser>(
       default: "intermediate",
     },
     googleId: { type: String, unique: true, sparse: true },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
     preferences: { type: preferencesSchema, default: () => ({}) },
     isActive: { type: Boolean, default: true },
     lastLogin: { type: Date },

@@ -21,6 +21,12 @@ const explanationLevels = [
   { value: "advanced", label: "Advanced", desc: "Deep dives with technical precision" },
 ]
 
+const aiModels = [
+  { value: "gpt-4", label: "GPT-4" },
+  { value: "gemini-1.5", label: "Gemini 1.5 Pro" },
+  { value: "claude-3", label: "Claude 3 Opus" },
+]
+
 export function SettingsPage() {
   const { user, updateUser } = useAuth()
   const { toast } = useToast()
@@ -29,6 +35,7 @@ export function SettingsPage() {
   const [theme, setTheme] = useState<"light" | "dark" | "system">("system")
   const [language, setLanguage] = useState("en")
   const [explanationLevel, setExplanationLevel] = useState<"beginner" | "intermediate" | "advanced">("intermediate")
+  const [aiModel, setAiModel] = useState<"gpt-4" | "gemini-1.5" | "claude-3">("gemini-1.5")
   const [emailNotifications, setEmailNotifications] = useState(true)
 
   useEffect(() => {
@@ -36,6 +43,7 @@ export function SettingsPage() {
       setTheme(user.preferences.theme || "system")
       setLanguage(user.preferences.language || "en")
       setExplanationLevel(user.preferences.explanationLevel || "intermediate")
+      setAiModel(user.preferences.aiModel || "gemini-1.5")
       setEmailNotifications(user.preferences.emailNotifications ?? true)
     }
   }, [user])
@@ -43,7 +51,7 @@ export function SettingsPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const prefs = await updatePreferences({ theme, language, explanationLevel, emailNotifications })
+      const prefs = await updatePreferences({ theme, language, explanationLevel, aiModel, emailNotifications })
       if (user) {
         updateUser({ ...user, preferences: prefs })
       }
@@ -108,6 +116,27 @@ export function SettingsPage() {
             >
               {languages.map((lang) => (
                 <option key={lang.value} value={lang.value}>{lang.label}</option>
+              ))}
+            </select>
+          </Card.Content>
+        </Card>
+
+        {/* AI Model */}
+        <Card>
+          <Card.Title>
+            <div className="flex items-center gap-2">
+              <Brain className="h-4 w-4" /> AI Model
+            </div>
+          </Card.Title>
+          <Card.Description>Select the underlying AI model powering your experience</Card.Description>
+          <Card.Content className="mt-4">
+            <select
+              value={aiModel}
+              onChange={(e) => setAiModel(e.target.value as typeof aiModel)}
+              className="block w-full max-w-xs rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all"
+            >
+              {aiModels.map((model) => (
+                <option key={model.value} value={model.value}>{model.label}</option>
               ))}
             </select>
           </Card.Content>

@@ -9,6 +9,7 @@ export interface User {
   difficulty: "beginner" | "intermediate" | "advanced";
   preferences: UserPreferences;
   isActive: boolean;
+  role: "user" | "admin";
   lastLogin?: string;
   createdAt: string;
   updatedAt: string;
@@ -18,6 +19,7 @@ export interface UserPreferences {
   theme: "light" | "dark" | "system";
   language: string;
   explanationLevel: "beginner" | "intermediate" | "advanced";
+  aiModel?: "gpt-4" | "gemini-1.5" | "claude-3";
   emailNotifications: boolean;
 }
 
