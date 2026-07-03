@@ -41,3 +41,50 @@ export interface Activity {
   metadata?: Record<string, unknown>;
   createdAt: string;
 }
+
+export interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+export interface Concept {
+  _id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  description: string;
+  content: string;
+  category: Category | string;
+  tags: string[];
+  difficulty: "beginner" | "intermediate" | "advanced";
+  estimatedReadingTime: number;
+  references: Array<{ title: string; url: string }>;
+  status: "draft" | "published" | "archived";
+  createdAt: string;
+}
+
+export interface Collection {
+  _id: string;
+  name: string;
+  description?: string;
+  user: string;
+  concepts: Concept[];
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Bookmark {
+  _id: string;
+  concept: Concept;
+  folder?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface LearningProgress {
+  viewed: number;
+  completed: number;
+}

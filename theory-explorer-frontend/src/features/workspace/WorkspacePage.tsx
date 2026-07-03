@@ -34,8 +34,11 @@ export function WorkspacePage() {
 
   useEffect(() => {
     if (!authLoading) {
-      fetchWorkspaceStats().then((res) => {
-        setData(res)
+      Promise.all([
+        fetchWorkspaceStats(),
+        import("@/lib/progress").then(m => m.getHistory())
+      ]).then(([statsData, historyData]) => {
+        setData({ ...statsData, history: historyData })
         setLoading(false)
       }).catch(() => setLoading(false))
     }
@@ -137,18 +140,45 @@ export function WorkspacePage() {
               </div>
             </Card.Title>
             <Card.Content className="mt-2">
-              <EmptyState
-                icon={<BookOpen className="h-6 w-6" />}
-                title="No concepts in progress"
-                description="Start exploring topics and your recent learning will appear here."
-                action={
-                  <Link to="/explore">
-                    <Button size="sm">
-                      <Compass className="h-4 w-4" /> Explore Topics
-                    </Button>
-                  </Link>
-                }
-              />
+              {data?.history && data.history.length > 0 ? (
+                <div className="space-y-3 mt-4">
+                  {data.history.slice(0, 3).map((progress: any) => (
+                    <Link
+                      key={progress._id}
+                      to={`/knowledge/${progress.concept.slug}`}
+                      className="group flex items-center justify-between rounded-lg border p-3 transition-all hover:border-primary-200 hover:bg-primary-50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="rounded bg-primary-100 p-2 text-primary-600">
+                          <BookOpen className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 group-hover:text-primary-700">
+                            {progress.concept.title}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {progress.concept.estimatedReadingTime} min read • {progress.concept.category?.name || "Topic"}
+                          </p>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-primary-600" />
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={<BookOpen className="h-6 w-6" />}
+                  title="No concepts in progress"
+                  description="Start exploring topics and your recent learning will appear here."
+                  action={
+                    <Link to="/explore">
+                      <Button size="sm">
+                        <Compass className="h-4 w-4" /> Explore Topics
+                      </Button>
+                    </Link>
+                  }
+                />
+              )}
             </Card.Content>
           </Card>
 
