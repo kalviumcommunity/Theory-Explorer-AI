@@ -4,6 +4,7 @@ import { getConcept } from "@/lib/concepts";
 import { trackView } from "@/lib/progress";
 import ReactMarkdown from "react-markdown";
 import { useEffect } from "react";
+import { AIChat } from "@/features/ai/AIChat";
 
 export function KnowledgePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -67,24 +68,34 @@ export function KnowledgePage() {
         </div>
       </div>
       
-      <article className="prose prose-slate lg:prose-lg max-w-none prose-headings:font-semibold prose-a:text-primary-600 hover:prose-a:text-primary-500">
-        <ReactMarkdown>{concept.content}</ReactMarkdown>
-      </article>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <article className="prose prose-slate lg:prose-lg max-w-none prose-headings:font-semibold prose-a:text-primary-600 hover:prose-a:text-primary-500">
+            <ReactMarkdown>{concept.content}</ReactMarkdown>
+          </article>
 
-      {concept.references && concept.references.length > 0 && (
-        <div className="mt-12 pt-8 border-t">
-          <h3 className="text-lg font-semibold mb-4">References</h3>
-          <ul className="list-disc pl-5 space-y-2">
-            {concept.references.map((ref, i) => (
-              <li key={i}>
-                <a href={ref.url} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">
-                  {ref.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+          {concept.references && concept.references.length > 0 && (
+            <div className="mt-12 pt-8 border-t">
+              <h3 className="text-lg font-semibold mb-4">References</h3>
+              <ul className="list-disc pl-5 space-y-2">
+                {concept.references.map((ref: any, i: number) => (
+                  <li key={i}>
+                    <a href={ref.url} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">
+                      {ref.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
-      )}
+        
+        <div className="lg:col-span-1">
+          <div className="sticky top-24">
+            <AIChat />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
